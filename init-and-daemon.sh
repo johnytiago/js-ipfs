@@ -19,4 +19,4 @@ if [ -n "$IPFS_API_HOST" ]; then
   sed -i.bak "s/127.0.0.1/$IPFS_API_HOST/g" $IPFS_PATH/config
 fi
 
-node src/cli/bin.js daemon
+node src/cli/bin.js daemon --enable-dht-experiment
