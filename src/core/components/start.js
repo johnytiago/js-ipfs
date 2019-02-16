@@ -38,6 +38,10 @@ module.exports = (self) => {
     ], (err) => {
       if (err) { return done(err) }
 
+      if (self._options.dht) {
+        self._libp2pNode.dht.mountStartrail(self.startrail)
+      }
+
       self._bitswap = new Bitswap(
         self._libp2pNode,
         self._repo.blocks,
@@ -46,6 +50,7 @@ module.exports = (self) => {
 
       self._bitswap.start()
       self._blockService.setExchange(self._bitswap)
+
       done()
     })
   })
