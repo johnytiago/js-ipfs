@@ -1,14 +1,13 @@
 FROM node:9.5.0
 
 WORKDIR /usr/src/app
-COPY . /usr/src/app
 
 ENV IPFS_WRTC_LINUX_WINDOWS=1
 ENV IPFS_MONITORING=1
 ENV IPFS_PATH=/root/.jsipfs
 ENV IPFS_API_HOST=0.0.0.0
 
-ENV BUILD_DEPS='libnspr4 libnspr4-dev libnss3'
+ENV BUILD_DEPS='libnspr4 libnspr4-dev libnss3 net-tools'
 
 EXPOSE 4002
 EXPOSE 4003
@@ -17,8 +16,11 @@ EXPOSE 9090
 
 RUN apt-get update \
   && apt-get install --yes $BUILD_DEPS \
-  && rm -rf /var/lib/apt/lists/* \
-  && npm install --production \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY ./package.json /usr/src/app/
+
+RUN npm install --production \
   && npm install wrtc@0.0.67 --production \
   && npm cache clear --force \
   && apt-get purge --yes $BUILD_DEPS \
@@ -26,5 +28,7 @@ RUN apt-get update \
   && rm -rf /usr/local/share/.cache \
   && rm -rf node_modules/go-ipfs-dep/go-ipfs/ipfs \
   && ln -s $(pwd)/src/cli/bin.js /usr/local/bin/jsipfs
+
+COPY . /usr/src/app
 
 CMD ./init-and-daemon.sh
