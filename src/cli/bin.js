@@ -10,6 +10,8 @@ const print = utils.print
 const mfs = require('ipfs-mfs/cli')
 const debug = require('debug')('ipfs:cli')
 const pkg = require('../../package.json')
+const parser = require('./parser')
+const commandAlias = require('./command-alias')
 
 async function main (args) {
   const oneWeek = 1000 * 60 * 60 * 24 * 7
@@ -49,6 +51,9 @@ async function main (args) {
 
   // add MFS (Files API) commands
   mfs(cli)
+
+  // Apply command aliasing (eg `refs local` -> `refs-local`)
+  args = commandAlias(args)
 
   cli
     .commandDir('commands')
