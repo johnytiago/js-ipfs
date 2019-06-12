@@ -11,6 +11,6 @@ fi
 
 # Initialize the repo but ignore if error if it already exists
 # This can be the case when we restart a container without stopping/removing it
-node src/cli/bin.js init $IPFS_CONFIG || true
+node src/cli/bin.js init $IPFS_CONFIG || node src/cli/bin.js init || true
 
 node src/cli/bin.js daemon --enable-dht-experiment
