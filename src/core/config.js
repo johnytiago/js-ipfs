@@ -31,6 +31,7 @@ const schema = Joi.object().keys({
     pubsub: Joi.boolean(),
     ipnsPubsub: Joi.boolean(),
     sharding: Joi.boolean(),
+    startrail: Joi.boolean(),
     dht: Joi.boolean()
   }).allow(null),
   connectionManager: Joi.object().allow(null),

@@ -70,10 +70,13 @@ module.exports = (self) => {
         // DHT should be added as routing if we are not running with local flag
         if (!self._options.offline) {
           ipnsStores.push(self.libp2p.dht)
-          self.libp2p._dht.mountStartrail(self.startrail)
         } else {
           const offlineDatastore = new OfflineDatastore(self._repo)
           ipnsStores.push(offlineDatastore)
+        }
+
+        if (get(self._options, 'EXPERIMENTAL.startrail', false)) {
+          self.libp2p._dht.mountStartrail(self.startrail)
         }
 
         // Create ipns routing with a set of datastores
