@@ -5,6 +5,7 @@ services:
 
 stages:
   - build
+  - test
 
 variables:
   # Docker registry config
@@ -25,3 +26,37 @@ build:image:
     - docker tag ${PROJECT_PATH}:${CI_COMMIT_SHA} ${PROJECT_PATH}:latest
     - docker push ${PROJECT_PATH}:${CI_COMMIT_SHA}
     - docker push ${PROJECT_PATH}:latest
+
+# Build the test image based on the base prod image and run the tests
+#  - PROJECT_PATH: docker image repository path
+test:node:core:
+  stage: test
+  image: docker:latest
+  dependencies:
+    - build:image
+  tags:
+    - node
+  script:
+    - docker load -i ${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
+    - docker build --rm
+      --cache-from ${PROJECT_PATH}:${CI_COMMIT_SHA}
+      -t ${PROJECT_PATH}:${CI_COMMIT_SHA}-test .
+    - docker run
+      ${PROJECT_PATH}:${CI_COMMIT_SHA}-test
+      npm run test:node:core
+
+test:startrail:
+  stage: test
+  image: docker:latest
+  dependencies:
+    - build:image
+  tags:
+    - node
+  script:
+    - docker load -i ${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
+    - docker build --rm
+      --cache-from ${PROJECT_PATH}:${CI_COMMIT_SHA}
+      -t ${PROJECT_PATH}:${CI_COMMIT_SHA}-test .
+    - docker run
+      ${PROJECT_PATH}:${CI_COMMIT_SHA}-test
+      npm run test:node:core:startrail

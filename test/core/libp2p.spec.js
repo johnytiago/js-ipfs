@@ -18,7 +18,7 @@ const Libp2p = require('libp2p')
 
 const libp2pComponent = require('../../src/core/components/libp2p')
 
-describe('libp2p customization', function () {
+describe.skip('libp2p customization', function () {
   // Provide some extra time for ci since we're starting libp2p nodes in each test
   this.timeout(25 * 1000)
 
