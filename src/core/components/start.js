@@ -6,6 +6,7 @@ const get = require('lodash/get')
 const setImmediate = require('async/setImmediate')
 const promisify = require('promisify-es6')
 const { TieredDatastore } = require('datastore-core')
+const Startrail = require('startrail')
 
 const IPNS = require('../ipns')
 const PubsubDatastore = require('../ipns/routing/pubsub-datastore')
@@ -75,9 +76,6 @@ module.exports = (self) => {
           ipnsStores.push(offlineDatastore)
         }
 
-        if (get(self._options, 'EXPERIMENTAL.startrail', false)) {
-          self.libp2p._dht.mountStartrail(self.startrail)
-        }
 
         // Create ipns routing with a set of datastores
         const routing = new TieredDatastore(ipnsStores)
@@ -91,6 +89,15 @@ module.exports = (self) => {
 
         self._bitswap.start()
         self._blockService.setExchange(self._bitswap)
+
+        if (get(self._options, 'EXPERIMENTAL.startrail', false)) {
+          self._startrail = new Startrail(
+            self._repo.blocks,
+            self._bitswap,
+            self.libp2p
+          )
+          self.libp2p._dht.mountStartrail(self._startrail)
+        }
 
         self._preload.start()
         self._ipns.republisher.start()

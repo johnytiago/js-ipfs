@@ -30,7 +30,7 @@ function createNode (callback) {
     config,
     initOptions: { bits: 512 },
     EXPERIMENTAL: {
-      startrail: false
+      startrail: true
     }
   }, callback)
 }
