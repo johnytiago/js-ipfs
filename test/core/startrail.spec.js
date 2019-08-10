@@ -39,14 +39,17 @@ describe('Startrail', () => {
   let nodeA
   let nodeB
   let nodeC
+  let nodeD
   let addrB
   let addrC
+  let addrD
 
   let nodes
   before(function (done) {
-    this.timeout(30 * 1000)
+    this.timeout(40 * 1000)
 
     parallel([
+      (cb) => createNode(cb),
       (cb) => createNode(cb),
       (cb) => createNode(cb),
       (cb) => createNode(cb)
@@ -56,57 +59,42 @@ describe('Startrail', () => {
       nodeA = _nodes[0].api
       nodeB = _nodes[1].api
       nodeC = _nodes[2].api
+      nodeD = _nodes[3].api
       parallel([
         (cb) => nodeA.id(cb),
         (cb) => nodeB.id(cb),
-        (cb) => nodeC.id(cb)
+        (cb) => nodeC.id(cb),
+        (cb) => nodeD.id(cb)
       ], (err, ids) => {
         expect(err).to.not.exist()
         addrB = ids[1].addresses[0]
         addrC = ids[2].addresses[0]
+        addrD = ids[3].addresses[0]
         parallel([
           (cb) => nodeA.swarm.connect(addrB, cb),
-          (cb) => nodeB.swarm.connect(addrC, cb)
+          (cb) => nodeB.swarm.connect(addrC, cb),
+          (cb) => nodeB.swarm.connect(addrD, cb)
         ], done)
       })
     })
   })
 
-  after((done) => parallel(nodes.map((node) => (cb) => node.stop(cb)), done))
+  after((done) => parallel(nodes.map((node) => (cb) => node.stop(err => {
+    err && err.message === "Already stopped" ? cb() : cb(err)
+  })), done))
 
-  it('add a file in B, fetch in A', function (done) {
+  it('add a file in A, fetch in C, fetch through B in D', async function () {
     this.timeout(30 * 1000)
     const file = {
       path: 'testfile1.txt',
-      content: Buffer.from('hello kad 1')
+      content: Buffer.from('hello cache')
     }
 
-    nodeB.add(file, (err, filesAdded) => {
-      expect(err).to.not.exist()
-
-      nodeA.cat(filesAdded[0].hash, (err, data) => {
-        expect(err).to.not.exist()
-        expect(data.toString()).to.eql('hello kad 1')
-        done()
-      })
-    })
-  })
-
-  it('add a file in C, fetch through B in A', function (done) {
-    this.timeout(30 * 1000)
-    const file = {
-      path: 'testfile2.txt',
-      content: Buffer.from('hello kad 2')
-    }
-
-    nodeC.add(file, (err, filesAdded) => {
-      expect(err).to.not.exist()
-
-      nodeA.cat(filesAdded[0].hash, (err, data) => {
-        expect(err).to.not.exist()
-        expect(data.toString()).to.eql('hello kad 2')
-        done()
-      })
-    })
+    const filesAdded = await nodeA.add(file)
+    await nodeC.cat(filesAdded[0].hash)
+    await nodeA.stop()
+    await nodeC.stop()
+    const fetched = await nodeD.cat(filesAdded[0].hash)
+    expect(fetched.toString()).to.eql('hello cache')
   })
 })
