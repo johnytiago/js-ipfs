@@ -18,7 +18,7 @@ EXPOSE 9090
 RUN apt-get update \
   && apt-get install --yes $BUILD_DEPS \
   && rm -rf /var/lib/apt/lists/* \
-  && npm install --production \
+  && npm install \
   && npm install wrtc@0.0.67 --production \
   && npm cache clear --force \
   && apt-get purge --yes $BUILD_DEPS \
