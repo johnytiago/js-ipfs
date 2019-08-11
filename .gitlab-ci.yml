@@ -37,13 +37,7 @@ test:node:core:
   tags:
     - docker
   script:
-    - docker load -i ${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
-    - docker build --rm
-      --cache-from ${PROJECT_PATH}:${CI_COMMIT_SHA}
-      -t ${PROJECT_PATH}:${CI_COMMIT_SHA}-test .
-    - docker run
-      ${PROJECT_PATH}:${CI_COMMIT_SHA}-test
-      npm run test:node:core
+    - docker run ${PROJECT_PATH}:${CI_COMMIT_SHA} npm run test:node:core
 
 test:startrail:
   stage: test
@@ -53,10 +47,4 @@ test:startrail:
   tags:
     - docker
   script:
-    - docker load -i ${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
-    - docker build --rm
-      --cache-from ${PROJECT_PATH}:${CI_COMMIT_SHA}
-      -t ${PROJECT_PATH}:${CI_COMMIT_SHA}-test .
-    - docker run
-      ${PROJECT_PATH}:${CI_COMMIT_SHA}-test
-      npm run test:node:core:startrail
+    - docker run ${PROJECT_PATH}:${CI_COMMIT_SHA} npm run test:node:core:startrail
