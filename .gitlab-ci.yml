@@ -35,7 +35,7 @@ test:node:core:
   dependencies:
     - build:image
   tags:
-    - node
+    - docker
   script:
     - docker load -i ${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
     - docker build --rm
@@ -51,7 +51,7 @@ test:startrail:
   dependencies:
     - build:image
   tags:
-    - node
+    - docker
   script:
     - docker load -i ${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
     - docker build --rm
