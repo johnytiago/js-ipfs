@@ -50,6 +50,7 @@ const schema = Joi.object().keys({
         Enabled: Joi.boolean()
       }).allow(null)
     }).allow(null),
+    Startrail: Joi.object().allow(null),
     Bootstrap: Joi.array().items(Joi.multiaddr().IPFS().options({ convert: false }))
   }).allow(null),
   libp2p: Joi.alternatives().try(

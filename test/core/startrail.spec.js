@@ -22,7 +22,13 @@ const config = {
       Enabled: false
     }
   },
-}
+  Startrail: {
+    popularityManager: {
+      cacheThreshold: 2
+    }
+  }
+};
+
 
 function createNode (callback) {
   f.spawn({
@@ -40,15 +46,18 @@ describe('Startrail', () => {
   let nodeB
   let nodeC
   let nodeD
+  let nodeE
   let addrB
   let addrC
   let addrD
+  let addrE
 
   let nodes
   before(function (done) {
     this.timeout(40 * 1000)
 
     parallel([
+      (cb) => createNode(cb),
       (cb) => createNode(cb),
       (cb) => createNode(cb),
       (cb) => createNode(cb),
@@ -60,20 +69,23 @@ describe('Startrail', () => {
       nodeB = _nodes[1].api
       nodeC = _nodes[2].api
       nodeD = _nodes[3].api
+      nodeE = _nodes[4].api
       parallel([
-        (cb) => nodeA.id(cb),
         (cb) => nodeB.id(cb),
         (cb) => nodeC.id(cb),
-        (cb) => nodeD.id(cb)
+        (cb) => nodeD.id(cb),
+        (cb) => nodeE.id(cb)
       ], (err, ids) => {
         expect(err).to.not.exist()
-        addrB = ids[1].addresses[0]
-        addrC = ids[2].addresses[0]
-        addrD = ids[3].addresses[0]
+        addrB = ids[0].addresses[0]
+        addrC = ids[1].addresses[0]
+        addrD = ids[2].addresses[0]
+        addrE = ids[3].addresses[0]
         parallel([
           (cb) => nodeA.swarm.connect(addrB, cb),
           (cb) => nodeB.swarm.connect(addrC, cb),
-          (cb) => nodeB.swarm.connect(addrD, cb)
+          (cb) => nodeB.swarm.connect(addrD, cb),
+          (cb) => nodeB.swarm.connect(addrE, cb)
         ], done)
       })
     })
@@ -92,8 +104,10 @@ describe('Startrail', () => {
 
     const filesAdded = await nodeA.add(file)
     await nodeC.cat(filesAdded[0].hash)
+    await nodeE.cat(filesAdded[0].hash)
     await nodeA.stop()
     await nodeC.stop()
+    await nodeE.stop()
     const fetched = await nodeD.cat(filesAdded[0].hash)
     expect(fetched.toString()).to.eql('hello cache')
   })

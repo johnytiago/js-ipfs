@@ -94,7 +94,8 @@ module.exports = (self) => {
           self._startrail = new Startrail(
             self._repo.blocks,
             self._bitswap,
-            self.libp2p
+            self.libp2p,
+            get(self._options, 'config.Startrail')
           )
           self.libp2p._dht.mountStartrail(self._startrail)
         }

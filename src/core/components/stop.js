@@ -27,6 +27,10 @@ module.exports = (self) => {
       callback()
     }
 
+    if (self._startrail) {
+      self._startrail.stop()
+    }
+
     self.state.stop()
     self._blockService.unsetExchange()
     self._bitswap.stop()
