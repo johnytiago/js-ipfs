@@ -83,25 +83,25 @@ describe('interface-ipfs-core tests', function () {
     }
   }))
 
-  tests.miscellaneous(CommonFactory.create({
-    // No need to stop, because the test suite does a 'stop' test.
-    createTeardown: () => cb => cb()
-  }), {
-    skip: [
-      {
-        name: 'should resolve an IPNS DNS link',
-        reason: 'TODO IPNS not implemented yet'
-      },
-      {
-        name: 'should resolve IPNS link recursively',
-        reason: 'TODO IPNS not implemented yet'
-      },
-      {
-        name: ' should recursively resolve ipfs.io',
-        reason: 'failing on gitlab-CI'
-      }
-    ]
-  })
+  //tests.miscellaneous(CommonFactory.create({
+    //// No need to stop, because the test suite does a 'stop' test.
+    //createTeardown: () => cb => cb()
+  //}), {
+    //skip: [
+      //{
+        //name: 'should resolve an IPNS DNS link',
+        //reason: 'TODO IPNS not implemented yet'
+      //},
+      //{
+        //name: 'should resolve IPNS link recursively',
+        //reason: 'TODO IPNS not implemented yet'
+      //},
+      //{
+        //name: ' should recursively resolve ipfs.io',
+        //reason: 'failing on gitlab-CI'
+      //}
+    //]
+  //})
 
   tests.name(CommonFactory.create({
     spawnOptions: {
