@@ -33,7 +33,7 @@
     "test:webworker": "aegir test -t webworker --no-cors --timeout=10000",
     "test:node:core": "aegir test -t node -f test/core/**/*.js --timeout=10000",
     "test:node:core:startrail": "aegir test -t node -f test/core/startrail.spec.js --timeout=10000",
-    "test:debug": "node_modules/.bin/mocha debug test/core/**",
+    "test:debug": "node_modules/.bin/mocha debug test/core/startrail.spec.js",
     "test:node:http": "aegir test -t node -f test/http-api/index.js --timeout=10000",
     "test:node:gateway": "aegir test -t node -f test/gateway/index.js --timeout=10000",
     "test:node:cli": "aegir test -t node -f test/cli/index.js --timeout=10000",
