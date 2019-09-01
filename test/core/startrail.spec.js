@@ -41,8 +41,7 @@ function createNode (startrail, callback) {
     initOptions: { bits: 512 },
     EXPERIMENTAL: {
       startrail
-    },
-    timeout: 5
+    }
   }, callback)
 }
 
@@ -187,6 +186,7 @@ describe('Startrail', () => {
       await nodeC.stop()
       await nodeE.stop()
       //Should timeout
+      // TODO: Find a way to expect timout from cat
       const fetched = await nodeD.cat(filesAdded[0].hash)
     })
   })
