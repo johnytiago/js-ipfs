@@ -90,15 +90,17 @@ module.exports = (self) => {
         self._bitswap.start()
         self._blockService.setExchange(self._bitswap)
 
-        if (get(self._options, 'EXPERIMENTAL.startrail', false)) {
-          self._startrail = new Startrail(
-            self._repo.blocks,
-            self._bitswap,
-            self.libp2p,
-            get(self._options, 'config.Startrail')
-          )
-          self.libp2p._dht.mountStartrail(self._startrail)
-        }
+        console.log(self._options.EXPERIMENTAL)
+        //if (get(self._options, 'EXPERIMENTAL.startrail', false)) {
+        self._startrail = new Startrail(
+          self._repo.blocks,
+          self._bitswap,
+          self.libp2p,
+          get(self._options, 'config.Startrail')
+        )
+        self.libp2p._dht.mountStartrail(self._startrail)
+        console.log("Startrail started")
+        //}
 
         self._preload.start()
         self._ipns.republisher.start()
