@@ -6,6 +6,7 @@ services:
 stages:
   - build
   - test
+  - release
 
 variables:
   # Docker registry config
@@ -21,30 +22,52 @@ build:image:
   tags:
     - docker
   script:
-    - docker login -u ${DOCKER_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${DOCKER_REGISTRY_URL}
     - docker build --rm -t ${PROJECT_PATH}:${CI_COMMIT_SHA} .
-    - docker tag ${PROJECT_PATH}:${CI_COMMIT_SHA} ${PROJECT_PATH}:latest
-    - docker push ${PROJECT_PATH}:${CI_COMMIT_SHA}
-    - docker push ${PROJECT_PATH}:latest
+    - docker save ${PROJECT_PATH}:${CI_COMMIT_SHA} -o ./${CI_PROJECT_NAME}:${CI_COMMIT_SHA}.tar.gz
+  artifacts:
+    name: image-${CI_PROJECT_NAME}:${CI_COMMIT_SHA}
+    paths:
+    - ${CI_PROJECT_NAME}:${CI_COMMIT_SHA}.tar.gz
+    expire_in: 3 days
 
 # Build the test image based on the base prod image and run the tests
 #  - PROJECT_PATH: docker image repository path
-test:node:core:
+.test:
   stage: test
   image: docker:latest
   dependencies:
     - build:image
   tags:
     - docker
+  before_script:
+    - docker load -i ${CI_PROJECT_NAME}:${CI_COMMIT_SHA}.tar.gz
+    - docker build --rm
+      --cache-from ${PROJECT_PATH}:${CI_COMMIT_SHA}
+      -t ${PROJECT_PATH}:${CI_COMMIT_SHA}-test .
+
+test:node:core:
+  extends: .test
   script:
-    - docker run ${PROJECT_PATH}:${CI_COMMIT_SHA} npm run test:node:core
+    - docker run ${PROJECT_PATH}:${CI_COMMIT_SHA}-test npm run test:node:core
 
 test:startrail:
-  stage: test
+  extends: .test
+  script:
+    - docker run ${PROJECT_PATH}:${CI_COMMIT_SHA}-test npm run test:node:core:startrail
+
+release:image:
+  stage: release
   image: docker:latest
   dependencies:
     - build:image
   tags:
     - docker
+  variables:
+    # Disable git usage
+    GIT_STRATEGY: none
   script:
-    - docker run ${PROJECT_PATH}:${CI_COMMIT_SHA} npm run test:node:core:startrail
+    - docker login -u ${DOCKER_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${DOCKER_REGISTRY_URL}
+    - docker load -i ${CI_PROJECT_NAME}:${CI_COMMIT_SHA}.tar.gz
+    - docker tag ${PROJECT_PATH}:${CI_COMMIT_SHA} ${PROJECT_PATH}:latest
+    - docker push ${PROJECT_PATH}:${CI_COMMIT_SHA}
+    - docker push ${PROJECT_PATH}:latest
