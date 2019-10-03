@@ -104,6 +104,7 @@ class IPFS extends EventEmitter {
     this._peerInfoBook = new PeerBook()
     this._peerInfo = undefined
     this._bitswap = undefined
+    this._startrail = undefined
     this._blockService = new BlockService(this._repo)
     this._ipld = new Ipld({
       blockService: this._blockService,
