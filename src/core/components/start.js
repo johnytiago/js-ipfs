@@ -76,7 +76,6 @@ module.exports = (self) => {
           ipnsStores.push(offlineDatastore)
         }
 
-
         // Create ipns routing with a set of datastores
         const routing = new TieredDatastore(ipnsStores)
         self._ipns = new IPNS(routing, self._repo.datastore, self._peerInfo, self._keychain, self._options)
@@ -90,22 +89,27 @@ module.exports = (self) => {
         self._bitswap.start()
         self._blockService.setExchange(self._bitswap)
 
-        console.log(self._options.EXPERIMENTAL)
-        if (get(self._options, 'EXPERIMENTAL.startrail') ||  process.env.STARTRAIL) {
-          self._startrail = new Startrail(
-            self._repo,
-            self._bitswap,
-            self.libp2p,
-            get(self._options, 'config.Startrail')
-          )
-          self.libp2p._dht.mountStartrail(self._startrail)
-          console.log("Startrail started")
-        }
-
         self._preload.start()
         self._ipns.republisher.start()
         self._mfsPreload.start(cb)
-      }
+      },
+      (cb) => {
+        if (get(self._options, 'EXPERIMENTAL.startrail') || process.env.STARTRAIL) {
+          self._repo.config.get((err, config) => {
+            if (err) return cb(err)
+
+            self._startrail = new Startrail(
+              self._repo,
+              self._bitswap,
+              self.libp2p,
+              config.Startrail
+            )
+            self.libp2p._dht.mountStartrail(self._startrail)
+            console.log("Startrail started")
+          })
+        }
+        cb()
+      },
     ], done)
   })
 }
